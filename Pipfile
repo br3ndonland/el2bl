@@ -9,6 +9,7 @@ black = "*"
 [packages]
 pytest = "*"
 pre-commit = "*"
+pampy = "*"
 
 [requires]
 python_version = "3.7"
