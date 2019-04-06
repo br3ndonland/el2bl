@@ -15,16 +15,17 @@ def read_enex():
         if os.path.exists(path):
             print(f"{path} is a valid directory.")
         files = os.scandir(path)
-        convert_links(files)
+            convert_links(path, files)
     except:
-        print("Please try again, and enter a valid file path.")
+        print("There was an error. Please try again.")
 
 
-def convert_links(files):
-    """Convert links in .enex files to Bear note link format
+def convert_links(path, files):
+    """Convert links in .enex files to Bear note link format:
+    Create directory for converted files
     """
-    if not os.path.exists("./bear"):
-        os.mkdir("./bear")
+    if not os.path.exists(f"{path}/bear"):
+        os.mkdir(f"{path}/bear")
     print("List of files:")
     for file in files:
         if file.name.endswith(".enex") and file.is_file():
