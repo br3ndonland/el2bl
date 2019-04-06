@@ -4,12 +4,16 @@ import os
 
 
 def read_enex():
-    """Read .enex files in directory
+    """Read .enex files in directory:
+    Accept path to directory from user input
+    Verify that directory is valid with os.path.exists()
+    Scan directory with os.scandir and create files object
+    Run convert_links(files)
     """
     try:
         path = input("Please provide the file path to your Evernote exports: ")
-        print(path)
-        # Read list of .enex files in directory.
+        if os.path.exists(path):
+            print(f"{path} is a valid directory.")
         files = os.scandir(path)
         convert_links(files)
     except:
