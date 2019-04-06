@@ -23,6 +23,8 @@ def read_enex():
 def convert_links(files):
     """Convert links in .enex files to Bear note link format
     """
+    if not os.path.exists("./bear"):
+        os.mkdir("./bear")
     print("List of files:")
     for file in files:
         if file.name.endswith(".enex") and file.is_file():
