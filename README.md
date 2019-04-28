@@ -21,6 +21,7 @@ Convert [Evernote](https://evernote.com/) internal relative note links to [Bear]
   - [Opening files](#opening-files)
   - [Matching patterns](#matching-patterns)
   - [Parsing Evernote exports with Beautiful Soup](#parsing-evernote-exports-with-beautiful-soup)
+  - [Saving files](#saving-files)
 
 ## Introduction
 
@@ -175,19 +176,19 @@ I decided to write a Python script that would convert Evernote note links to Bea
 #### Opening files and the `with` statement
 
 - The [`with` statement](https://docs.python.org/3/reference/compound_stmts.html#with) was introduced in [PEP 343](https://www.python.org/dev/peps/pep-0343/).
-- The advantage of using the `with` statement over simply `file.open()` is that TODO
+- As explained in the [Python Tricks context managers article](https://dbader.org/blog/python-context-managers-and-with-statement) and the [Python Tricks file i/o article](https://dbader.org/blog/python-file-io), the advantage of using the `with` statement over simply `file.open()` is that it creates a context under which file operations can occur and be automatically concluded.
 
 ### Matching patterns
 
 #### Regular expressions
 
 - After opening a file, Evernote links can be located with regular expressions (regex).
-- [RegExr](https://regexr.com/)
+- [RegExr](https://regexr.com/) can be used to test out regex.
 
 #### re
 
-- TODO: intro to re
-- Raw string notation enables developers to enter regular expressions into Python code without having to escape special characters, as described in the [`re` documentation](https://docs.python.org/3/library/re.html#raw-string-notation).
+- The Python [`re`](https://docs.python.org/3/library/re.html) package provides helpful features for regex operations.
+- Raw string notation (`r""`) enables developers to enter regular expressions into Python code without having to escape special characters, as described in the [`re` documentation](https://docs.python.org/3/library/re.html#raw-string-notation).
 - An Evernote note link can be matched with `re.compile(r'(<a href="evernote.*?>)(.*)(</a>)')`
 
 #### Pampy
@@ -227,23 +228,35 @@ I decided to write a Python script that would convert Evernote note links to Bea
 
   ```
 
-- After working with Pampy, I didn't find that it addressed my needs in this project.
-  - TODO finish explaining
-  - doesn't do a good job with strings
-  - doesn't do a good job with replacing
-  - How do I find all matches, not just one?
-  - why not using pampy? was only matching one, not very familiar with lambda functions yet
+- After working with Pampy, I didn't find that it addressed my needs in this project. Finding all matches, replacing matches, and working with strings were not as easy as they should be.
 
 ### Parsing Evernote exports with Beautiful Soup
 
-- TODO: intro to [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/). There are a few other options described in [The Hitchhiker's Guide to Python scenario guide to XML parsing](https://docs.python-guide.org/scenarios/xml/), which strangely does not mention Beautiful Soup.
+- I decided to try out [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/). There are a few other options described in [The Hitchhiker's Guide to Python scenario guide to XML parsing](https://docs.python-guide.org/scenarios/xml/), which strangely does not mention Beautiful Soup.
 - [Selecting a parser](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser):
   - This is not straightforward, because Evernote XML is a blend of XML and HTML.
   - I first tried [parsing XML](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#parsing-xml), using `xml`, the XML parser in `lxml`. I couldn't match links, and HTML elements were being read like `&lt;div&gt;` instead of `<div>`.
   - Notes didn't parse as expected when opening as HTML with `html.parser`.
-  - I ended up using `lxml` (the HTML parser in `lxml`).
+  - I ended up using `lxml` (the HTML parser in `lxml`). It was lenient enough to skip over the XML parts and correctly parse the HTML.
 - Now that I had a parser, I had to match Evernote note links.
-  - I started by learning about the different [kinds of filters](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#kinds-of-filters)
-  - TODO: Start here.
-  - [the string argument](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#the-string-argument).
-- Finding note links with [`soup.find_all()`](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#find-all)
+
+  - I started by learning about the different [kinds of filters](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#kinds-of-filters).
+  - I used an `href` attribute filter and a regular expression filter to identify Evernote note links. This method avoids replacing URLs that are not Evernote note links, such as https://evernote.com/, and Evernote note links outside of anchor tags, such as the text "the links are converted to `evernote:///`." The function looked like this:
+
+    ```py
+    def note_link(href):
+        """Identify note link URIs using href attribute and regex"""
+        return href and re.compile(r"evernote://").search(href)
+    ```
+
+  - I then passed the `note_link()` function into [`soup.find_all()`](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#find-all) to locate all note links, extracted the strings (note titles) from the links using the [string argument](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#the-string-argument), and replaced the links with the titles within double brackets.
+
+    ```py
+    for link in soup.find_all(href=note_link):
+        string = link.string.extract()
+        bear_link = link.replace_with(f"[[{string}]]")
+    ```
+
+### Saving files
+
+- The last step was to save the Beautiful Soup object to a new file.

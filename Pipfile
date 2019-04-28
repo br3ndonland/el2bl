@@ -10,6 +10,11 @@ black = "*"
 pytest = "*"
 pre-commit = "*"
 pampy = "*"
+beautifulsoup4 = "*"
+lxml = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
