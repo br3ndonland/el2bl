@@ -137,15 +137,29 @@ I decided to write a Python script that would convert Evernote note links to Bea
 - **[Pipenv](https://pipenv.readthedocs.io/en/latest/)** was used to manage the development virtual environment for this project.
 
   - Install Pipenv with a system package manager like [Homebrew](https://brew.sh/), or with the Python package manager `pip`.
-  - Use Pipenv to install the virtual environment from the Pipfile with `pipenv install --dev`. The `dev` flag was used to accommodate the Black autoformatter (see [code style](#code-style) below).
+  - Use Pipenv to install the virtual environment from the _Pipfile_ with `pipenv install --dev --pre`.
 
-    ```sh
-    cd path/to/repo
-    pipenv install --dev
-    ```
+    - The `dev` flag was used to accommodate the Black autoformatter (see [code style](#code-style) below).
+    - When generating a _Pipfile.lock_ containing dev packages, the `--pre` flag allows pre-releases into the lock file. A line will be added to the _Pipfile_ (TOML format):
+
+      ```toml
+      [pipenv]
+      allow_prereleases = true
+      ```
+
+    - Package versions can be specified in the _Pipfile_.
+
+      ```toml
+      [packages]
+      # Install version 1.3.0 and do not upgrade
+      pynetdicom = "==1.3.0"
+      # Install version 1.3.0 or above
+      pynetdicom = ">=1.3.0"
+      ```
+
+    - Further information can be found in the [Pipenv docs](https://pipenv.readthedocs.io/en/latest/basics/#specifying-versions-of-a-package).
 
   - Activate the virtual environment with `pipenv shell`.
-  - When generating a _Pipfile.lock_ containing dev packages, add the `--pre` flag to allow pre-releases into the lock file: `pipenv lock --pre`.
 
 - VSCode can be configured to recognize the Pipenv virtual environment. See [Using Python environments in VS Code](https://code.visualstudio.com/docs/python/environments).
   - _Command Palette -> Python: Select Interpreter_. Select virtual environment.
@@ -232,11 +246,10 @@ I decided to write a Python script that would convert Evernote note links to Bea
 
 ### Parsing Evernote exports with Beautiful Soup
 
-- I decided to try out [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/). There are a few other options described in [The Hitchhiker's Guide to Python scenario guide to XML parsing](https://docs.python-guide.org/scenarios/xml/), which strangely does not mention Beautiful Soup.
+- I decided to try out [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/). Beautiful Soup is usually used to parse webpages, as described in [this DigitalOcean tutorial](https://www.digitalocean.com/community/tutorials/how-to-scrape-web-pages-with-beautiful-soup-and-python-3), but Evernote notes are basically webpages, so Beautiful Soup makes sense here. There are a few other options described in [The Hitchhiker's Guide to Python scenario guide to XML parsing](https://docs.python-guide.org/scenarios/xml/), which strangely does not mention Beautiful Soup.
 - [Selecting a parser](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser):
   - This is not straightforward, because Evernote XML is a blend of XML and HTML.
   - I first tried [parsing XML](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#parsing-xml), using `xml`, the XML parser in `lxml`. I couldn't match links, and HTML elements were being read like `&lt;div&gt;` instead of `<div>`.
-  - Notes didn't parse as expected when opening as HTML with `html.parser`.
   - I ended up using `lxml` (the HTML parser in `lxml`). It was lenient enough to skip over the XML parts and correctly parse the HTML.
 - Now that I had a parser, I had to match Evernote note links.
 
