@@ -6,12 +6,13 @@ from bs4 import BeautifulSoup
 
 
 def input_enex_path():
-    """Read .enex files in directory:
-    Accept path to directory from user input
-    Verify that directory is valid with os.path.exists()
-    Scan directory with os.scandir and create files object
-    Create directory for converted files
-    Run function to convert links in each file
+    """Read .enex files in directory.
+
+    - Accept path to directory from user input
+    - Verify that directory is valid with os.path.exists()
+    - Scan directory with os.scandir and create files object
+    - Create directory for converted files
+    - Run function to convert links in each file
     """
     try:
         path = input("Please provide the file path to your Evernote exports: ")
@@ -19,11 +20,8 @@ def input_enex_path():
             print(f"Valid file path: {path}")
             if not os.path.exists(f"{path}/bear"):
                 os.mkdir(f"{path}/bear")
-            files = os.scandir(path)
-            print("List of files:")
-            for file in files:
+            for file in os.scandir(path):
                 if file.name.endswith(".enex") and file.is_file():
-                    print(f"Evernote export file name: {file.name}")
                     convert_links(file)
         else:
             print(f"Not a valid file path:\n{path}")
@@ -32,22 +30,25 @@ def input_enex_path():
 
 
 def convert_links(file):
-    """Convert links in .enex files to Bear note link format:
-    Read contents of file with Beautiful Soup and lxml parser
-    Identify note link URIs, but not other URIs
-    Replace Evernote note links with Bear note links
+    """Convert links in .enex files to Bear note link format.
+
+    - Read contents of file with Beautiful Soup
+    - Identify note link URIs, but not other URIs
+    - Replace Evernote note links with Bear note links
+    - Write to a new file in the bear subdirectory
     """
     with open(file) as enex:
-        soup = BeautifulSoup(enex, "lxml")
 
         def note_link(href):
             """Identify note link URIs using href attribute and regex"""
             return href and re.compile(r"evernote://").search(href)
 
+        soup = BeautifulSoup(enex, "lxml")
         for link in soup.find_all(href=note_link):
             string = link.string.extract()
             bear_link = link.replace_with(f"[[{string}]]")
-        print(soup)
+        with open(f"{os.path.dirname(file)}/bear/{file.name}", "x") as new_enex:
+            new_enex.write(str(soup))
 
 
 if __name__ == "__main__":

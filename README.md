@@ -260,3 +260,5 @@ I decided to write a Python script that would convert Evernote note links to Bea
 ### Saving files
 
 - The last step was to save the Beautiful Soup object to a new file.
+- I accomplished this using a nested `with` statement, and included `"x"` for exclusive creation mode, which creates the file.
+- For a helpful demo of a nested `with` statement, see [Corey Schafer's YouTube tutorial on Python file objects](https://youtu.be/Uh2ebFW8OYM?t=1112).
