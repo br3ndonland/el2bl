@@ -7,11 +7,8 @@ verify_ssl = true
 black = "*"
 
 [packages]
-pytest = "*"
 pre-commit = "*"
-pampy = "*"
 beautifulsoup4 = "*"
-lxml = "*"
 
 [requires]
 python_version = "3.7"
