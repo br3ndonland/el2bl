@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 def input_enex_path():
     """Read .enex files in directory.
-
+    ---
     - Accept path to directory from user input
     - Verify that directory is valid with os.path.exists()
     - Scan directory with os.scandir and create files object
@@ -21,10 +21,13 @@ def input_enex_path():
             if not os.path.exists(f"{path}/bear"):
                 os.mkdir(f"{path}/bear")
             for file in os.scandir(path):
-                if file.name.endswith(".enex") and file.is_file():
-                    print("Converting files...")
-                    convert_links(file)
-                    print("Done. New files available in the bear subdirectory.")
+                if file.is_file() and file.name.endswith(".enex"):
+                    print(f"Converting {file.name}...")
+                    try:
+                        convert_links(file)
+                        print("Done. New file available in the bear subdirectory.")
+                    except Exception as e:
+                        print(f"An error occurred:\n{e}\nPlease try again.")
         else:
             print(f"Not a valid file path:\n{path}")
     except Exception as e:
@@ -33,7 +36,7 @@ def input_enex_path():
 
 def convert_links(file):
     """Convert links in .enex files to Bear note link format.
-
+    ---
     - Read contents of file with Beautiful Soup, and convert to string
     - Replace Evernote note link URIs, but not other URIs, with Bear note links
     - Remove H1 tags from note body
@@ -41,7 +44,7 @@ def convert_links(file):
     """
     with open(file) as enex:
         soup = str(BeautifulSoup(enex, "html.parser"))
-        soup_sub = re.sub(r'(<a href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", soup)
+        soup_sub = re.sub(r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", soup)
         soup_sub = re.sub(r"(<h1>?)(.*?)(</h1>?)", r"\2", soup_sub)
         with open(f"{os.path.dirname(file)}/bear/{file.name}", "x") as new_enex:
             new_enex.write(soup_sub)
