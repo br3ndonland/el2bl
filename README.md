@@ -311,7 +311,34 @@ I decided to write a Python script that would convert Evernote note links to Bea
           new_enex.write(soup_sub)
   ```
 
-**Success!**
+**Success!** I tagged the repository at commit `788a00e` as v0.1.0.
+
+#### Updating regular expressions to catch all note links
+
+- v0.1.0 converted most of the links in my Evernote exports, but missed some. Further inspection showed that Evernote was inserting additional tags between the opening anchor tag a and the href, like:
+
+  ```
+  <a style="font-weight: bold;" href="evernote:///">Title</a>
+  ```
+
+- v0.2.0 correctly matches Evernote links, even if additional tags have been inserted into the anchor tag. The regex only needed a minor update to overlook the additional tags inside the anchor tag, from `(<a href="evernote.*?>)(.*?)(</a>?)` to `(<a.*?href="evernote.*?>)(.*?)(</a>?)`. Here's `convert_links(file)` after the update:
+
+  ```py
+  def convert_links(file):
+      """Convert links in .enex files to Bear note link format.
+      ---
+      - Read contents of file with Beautiful Soup, and convert to string
+      - Replace Evernote note link URIs, but not other URIs, with Bear note links
+      - Remove H1 tags from note body
+      - Write to a new file in the bear subdirectory
+      """
+      with open(file) as enex:
+          soup = str(BeautifulSoup(enex, "html.parser"))
+          soup_sub = re.sub(r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", soup)
+          soup_sub = re.sub(r"(<h1>?)(.*?)(</h1>?)", r"\2", soup_sub)
+          with open(f"{os.path.dirname(file)}/bear/{file.name}", "x") as new_enex:
+              new_enex.write(soup_sub)
+  ```
 
 #### Pampy
 
