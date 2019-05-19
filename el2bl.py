@@ -45,7 +45,7 @@ def convert_links(file):
     with open(file) as enex:
         soup = str(BeautifulSoup(enex, "html.parser"))
         soup_sub = re.sub(r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", soup)
-        soup_sub = re.sub(r"(<h1>?)(.*?)(</h1>?)", r"\2", soup_sub)
+        soup_sub = re.sub(r"(<h1.*?>)(.*?)(</h1>?)", r"\2", soup_sub)
         with open(f"{os.path.dirname(file)}/bear/{file.name}", "x") as new_enex:
             new_enex.write(soup_sub)
 
