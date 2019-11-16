@@ -6,6 +6,7 @@ Convert [Evernote](https://evernote.com/) internal relative note links to [Bear]
 
 ## Table of Contents <!-- omit in toc -->
 
+- [Quickstart](#quickstart)
 - [Introduction](#introduction)
   - [The externalized mind](#the-externalized-mind)
   - [The Evernote entrypoint](#the-evernote-entrypoint)
@@ -21,6 +22,30 @@ Convert [Evernote](https://evernote.com/) internal relative note links to [Bear]
   - [Reading and writing files](#reading-and-writing-files)
   - [Parsing Evernote exports](#parsing-evernote-exports)
   - [Matching patterns](#matching-patterns)
+
+## Quickstart
+
+Install [Git](https://git-scm.com), [Python](https://www.python.org/) and [Pipenv](https://pipenv.readthedocs.io/en/latest/), then run the following commands in your terminal:
+
+```sh
+~
+❯ git clone git@github.com:br3ndonland/el2bl.git ~/el2bl
+
+~
+❯ cd ~/el2bl
+
+~/el2bl
+❯ pipenv install --dev
+
+~/el2bl
+❯ pipenv shell
+
+~/el2bl
+el2bl-hash ❯ pre-commit-install
+
+~/el2bl
+el2bl-hash ❯ python el2bl.py
+```
 
 ## Introduction
 
