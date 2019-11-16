@@ -16,20 +16,20 @@ def input_enex_path():
     """
     try:
         path = input("Please input the path to a directory with Evernote exports: ")
-        if os.path.exists(path):
-            print(f"Valid file path: {path}")
-            if not os.path.exists(f"{path}/bear"):
-                os.mkdir(f"{path}/bear")
-            for file in os.scandir(path):
-                if file.is_file() and file.name.endswith(".enex"):
-                    print(f"Converting {file.name}...")
-                    try:
-                        convert_links(file)
-                        print("Done. New file available in the bear subdirectory.")
-                    except Exception as e:
-                        print(f"An error occurred:\n{e}\nPlease try again.")
-        else:
+        if not os.path.exists(path):
             print(f"Not a valid file path:\n{path}")
+            return
+        print(f"Valid file path: {path}")
+        if not os.path.exists(f"{path}/bear"):
+            os.mkdir(f"{path}/bear")
+        for file in os.scandir(path):
+            if file.is_file() and file.name.endswith(".enex"):
+                print(f"Converting {file.name}...")
+                try:
+                    convert_links(file)
+                    print("Done. New file available in the bear subdirectory.")
+                except Exception as e:
+                    print(f"An error occurred:\n{e}\nPlease try again.")
     except Exception as e:
         print(f"An error occurred:\n{e}\nPlease try again.")
 
