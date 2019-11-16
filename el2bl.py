@@ -14,24 +14,17 @@ def input_enex_path():
     - Create directory for converted files
     - Run function to convert links in each file
     """
-    try:
-        path = input("Please input the path to a directory with Evernote exports: ")
-        if not os.path.exists(path):
-            print(f"Not a valid file path:\n{path}")
-            return
+    path = input("Please input the path to a directory with Evernote exports: ")
+    if not os.path.exists(path):
+        print(f"Not a valid file path:\n{path}")
+        return
+    else:
         print(f"Valid file path: {path}")
-        if not os.path.exists(f"{path}/bear"):
-            os.mkdir(f"{path}/bear")
-        for file in os.scandir(path):
-            if file.is_file() and file.name.endswith(".enex"):
-                print(f"Converting {file.name}...")
-                try:
-                    convert_links(file)
-                    print("Done. New file available in the bear subdirectory.")
-                except Exception as e:
-                    print(f"An error occurred:\n{e}\nPlease try again.")
-    except Exception as e:
-        print(f"An error occurred:\n{e}\nPlease try again.")
+    if not os.path.exists(f"{path}/bear"):
+        os.mkdir(f"{path}/bear")
+    for file in os.scandir(path):
+        if file.is_file() and file.name.endswith(".enex"):
+            convert_links(file)
 
 
 def convert_links(file):
@@ -42,12 +35,17 @@ def convert_links(file):
     - Remove H1 tags from note body
     - Write to a new file in the bear subdirectory
     """
-    with open(file) as enex:
-        soup = str(BeautifulSoup(enex, "html.parser"))
-        soup_sub = re.sub(r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", soup)
-        soup_sub = re.sub(r"(<h1.*?>)(.*?)(</h1>?)", r"\2", soup_sub)
-        with open(f"{os.path.dirname(file)}/bear/{file.name}", "x") as new_enex:
-            new_enex.write(soup_sub)
+    try:
+        print(f"Converting {file.name}...")
+        with open(file) as enex:
+            soup = str(BeautifulSoup(enex, "html.parser"))
+            soup_sub = re.sub(r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", soup)
+            soup_sub = re.sub(r"(<h1.*?>)(.*?)(</h1>?)", r"\2", soup_sub)
+            with open(f"{os.path.dirname(file)}/bear/{file.name}", "x") as new_enex:
+                new_enex.write(soup_sub)
+            print("Done. New file available in the bear subdirectory.")
+    except Exception as e:
+        print(f"An error occurred:\n{e}\nPlease try again.")
 
 
 if __name__ == "__main__":
