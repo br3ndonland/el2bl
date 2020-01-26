@@ -67,7 +67,7 @@ Internet search engines can't do everything though. Note apps enable users to cr
 
 Back in 2011, Evernote helped me digitize the information in my life and start externalizing my mind. By 2019, after eight years of extensive use, I had 5500 notes that formed a valuable personal knowledgebase. I had also experienced many bugs and frustrations over those eight years, and wanted to switch to a new note app.
 
-I definitely knew I wanted to ditch the Evernote XML format (sort of HTML-in-XML) and switch to Markdown. There are many note apps that use Markdown now, so it wasn't an issue. For some Markdown note app options, check out [Notable's comparison chart](https://raw.githubusercontent.com/notable/notable/master/resources/comparison/table.png) and [my Markdown guide](https://github.com/br3ndonland/udacity-fsnd/blob/master/info/markdown-guide.md).
+I definitely knew I wanted to ditch the Evernote XML format (sort of HTML-in-XML) and switch to Markdown. There are many note apps that use Markdown now, so it wasn't an issue. For some Markdown note app options, check out [Notable's comparison chart](https://notable.md/static/images/comparison.png) and [my Markdown guide](https://github.com/br3ndonland/udacity-fsnd/blob/master/info/markdown-guide.md).
 
 Another key feature I was looking for was note linking. Note links lead from one note to another within Evernote. Each note has its own link. Over time, note links create a personal encyclopedia or mind map of the connections among your notes, and enable quick navigation within the app. I therefore wanted to preserve the many note links I had created over the years. However, all the note apps I tried shared the same problem: Evernote note links aren't converted on import.
 
