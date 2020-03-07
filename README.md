@@ -41,7 +41,7 @@ Install [Git](https://git-scm.com), [Python](https://www.python.org/) and [Pipen
 ❯ pipenv shell
 
 ~/el2bl
-el2bl-hash ❯ pre-commit-install
+el2bl-hash ❯ pre-commit install
 
 ~/el2bl
 el2bl-hash ❯ python el2bl.py
