@@ -109,9 +109,9 @@ Here's the response:
 >
 > Thank you.
 
-I wasn't deterred by this response. After working with Bear a bit more, I was buoyed when I realized it has a key feature: [creating note links](https://bear.app/faq/Tags%20&%20Linking/How%20to%20link%20notes%20together/) by placing note titles within double brackets, like `[[Note title]]`. Much as the Evernote source code matches up note GUIDs with the correct notes, the Bear source code locates the note using the title within the double brackets, and links the note appropriately.
+Pretty lame, but I wasn't deterred by this response. After working with Bear a bit more, I was buoyed when I realized it has a key feature: [creating note links](https://bear.app/faq/Tags%20&%20Linking/How%20to%20link%20notes%20together/) by placing note titles within double brackets, like `[[Note title]]`. Much as the Evernote source code matches up note GUIDs with the correct notes, the Bear source code locates the note using the title within the double brackets, and links the note appropriately.
 
-This means that you can't change note titles after import. If note titles are changed, Bear won't be able to locate the notes. Clicking a note link after the title has been changed will create an empty note (as of version 1.6.13 (7111) for macOS). The inability to change note titles is is a small price to pay for retaining note links though.
+This means that changing note titles could break the links. As of Bear 1.7, this isn't a problem, because Bear automatically updates note links when note titles change.
 
 I decided to write a Python script that would convert Evernote note links to Bear note links.
 
