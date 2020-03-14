@@ -22,6 +22,7 @@ Convert [Evernote](https://evernote.com/) internal relative note links to [Bear]
   - [Reading and writing files](#reading-and-writing-files)
   - [Parsing Evernote exports](#parsing-evernote-exports)
   - [Matching patterns](#matching-patterns)
+- [Alternatives](#alternatives)
 
 ## Quickstart
 
@@ -397,3 +398,7 @@ I decided to write a Python script that would convert Evernote note links to Bea
   ```
 
 - After working with Pampy, I didn't find that it addressed my needs in this project. Finding all matches, replacing matches, and working with strings were not as easy as they should be.
+
+## Alternatives
+
+I chose Python for this project, but for a comparable JavaScript/TypeScript implementation, see [notable/dumper](https://github.com/notable/dumper), particularly _[enex.ts](https://github.com/notable/dumper/blob/master/src/providers/enex.ts)_.
