@@ -15,16 +15,16 @@ def input_enex_path() -> None:
     """
     input_path = input("Please input the path to a directory with Evernote exports: ")
     path = pathlib.Path(input_path)
-    if not (path.exists() and path.is_dir()):
-        print(f"Not a valid directory:\n{path}")
-        return
-    else:
-        print(f"Valid file path: {path}")
-    output_path = path / "bear"
-    output_path.mkdir(exist_ok=True)
-    for file in path.iterdir():
-        if file.is_file() and file.suffix == ".enex":
-            convert_links(file)
+    try:
+        if not path.is_dir():
+            raise NotADirectoryError(path)
+        output_path = path / "bear"
+        output_path.mkdir(exist_ok=True)
+        for file in path.iterdir():
+            if file.is_file() and file.suffix == ".enex":
+                convert_links(file)
+    except Exception as e:
+        print(f"\n{e.__class__.__qualname__}: {e}")
 
 
 def convert_links(enex_path: pathlib.Path) -> pathlib.Path:
@@ -35,21 +35,18 @@ def convert_links(enex_path: pathlib.Path) -> pathlib.Path:
     - Remove H1 tags from note body
     - Write to a new file in the bear subdirectory
     """
-    try:
-        print(f"Converting {enex_path.name}...")
-        enex_contents = enex_path.read_text()
-        enex_contents_with_converted_links = re.sub(
-            r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", enex_contents
-        )
-        enex_contents_with_converted_links = re.sub(
-            r"(<h1.*?>)(.*?)(</h1>?)", r"\2", enex_contents_with_converted_links
-        )
-        new_enex_path = enex_path.parent / "bear" / enex_path.name
-        new_enex_path.write_text(enex_contents_with_converted_links)
-        print("Done. New file available in the bear subdirectory.")
-        return new_enex_path
-    except Exception as e:
-        print(f"An error occurred:\n{e}\nPlease try again.")
+    print(f"Converting {enex_path.name}...")
+    enex_contents = enex_path.read_text()
+    enex_contents_with_converted_links = re.sub(
+        r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", enex_contents
+    )
+    enex_contents_with_converted_links = re.sub(
+        r"(<h1.*?>)(.*?)(</h1>?)", r"\2", enex_contents_with_converted_links
+    )
+    new_enex_path = enex_path.parent / "bear" / enex_path.name
+    new_enex_path.write_text(enex_contents_with_converted_links)
+    print("Done. New file available in the bear subdirectory.")
+    return new_enex_path
 
 
 if __name__ == "__main__":
