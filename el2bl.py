@@ -10,16 +10,13 @@ def input_enex_path() -> None:
     ---
     - Accept path to directory from user input
     - Verify that directory is valid
-    - Create directory for converted files
-    - Iterate over input directory and convert links in each file
+    - Iterate over directory and convert links in each file
     """
     input_path = input("Please input the path to a directory with Evernote exports: ")
     path = pathlib.Path(input_path)
     try:
         if not path.is_dir():
             raise NotADirectoryError(path)
-        output_path = path / "bear"
-        output_path.mkdir(exist_ok=True)
         for file in path.iterdir():
             if file.is_file() and file.suffix == ".enex":
                 convert_links(file)
@@ -43,9 +40,11 @@ def convert_links(enex_path: pathlib.Path) -> pathlib.Path:
     enex_contents_with_converted_links = re.sub(
         r"(<h1.*?>)(.*?)(</h1>?)", r"\2", enex_contents_with_converted_links
     )
-    new_enex_path = enex_path.parent / "bear" / enex_path.name
+    new_enex_dir = enex_path.parent / "bear"
+    new_enex_dir.mkdir(exist_ok=True)
+    new_enex_path = new_enex_dir / enex_path.name
     new_enex_path.write_text(enex_contents_with_converted_links)
-    print("Done. New file available in the bear subdirectory.")
+    print(f"Converted {enex_path.name}. New file available at {new_enex_path}.")
     return new_enex_path
 
 
