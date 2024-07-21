@@ -2,7 +2,6 @@
 """el2bl: convert Evernote note links to Bear note links"""
 import os
 import re
-from bs4 import BeautifulSoup
 
 
 def input_enex_path():
@@ -30,7 +29,7 @@ def input_enex_path():
 def convert_links(file):
     """Convert links in .enex files to Bear note link format.
     ---
-    - Read contents of file with Beautiful Soup, and convert to string
+    - Read contents of file
     - Replace Evernote note link URIs, but not other URIs, with Bear note links
     - Remove H1 tags from note body
     - Write to a new file in the bear subdirectory
@@ -38,11 +37,15 @@ def convert_links(file):
     try:
         print(f"Converting {file.name}...")
         with open(file) as enex:
-            soup = str(BeautifulSoup(enex, "html.parser"))
-            soup_sub = re.sub(r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", soup)
-            soup_sub = re.sub(r"(<h1.*?>)(.*?)(</h1>?)", r"\2", soup_sub)
+            enex_contents = enex.read()
+            enex_contents_with_converted_links = re.sub(
+                r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", enex_contents
+            )
+            enex_contents_with_converted_links = re.sub(
+                r"(<h1.*?>)(.*?)(</h1>?)", r"\2", enex_contents_with_converted_links
+            )
             with open(f"{os.path.dirname(file)}/bear/{file.name}", "x") as new_enex:
-                new_enex.write(soup_sub)
+                new_enex.write(enex_contents_with_converted_links)
             print("Done. New file available in the bear subdirectory.")
     except Exception as e:
         print(f"An error occurred:\n{e}\nPlease try again.")
