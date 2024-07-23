@@ -5,6 +5,28 @@ import pathlib
 import re
 
 
+def _format_note_link(match: re.Match) -> str:
+    """Format a note link for Bear.
+    ---
+    - Identify note title, assuming:
+        - Title is in second capture group
+        - Title in note link matches actual note title
+        - Title is not already escaped
+    - Format Bear wiki links (`[[note title]]`), escaping special characters:
+        - Backslashes are escape characters (backslashes themselves should be escaped)
+        - Forward slashes reference headings within notes (`[[note title/heading]]`)
+        - Pipes configure aliases (different link titles) (`[[note title|alias]]`)
+
+    https://docs.python.org/3/library/re.html
+    https://bear.app/faq/how-to-link-notes-together/
+    """
+    note_title = match.group(2)
+    escaped_note_title = note_title.replace("\\", r"\\")
+    escaped_note_title = escaped_note_title.replace("/", r"\/")
+    escaped_note_title = escaped_note_title.replace("|", r"\|")
+    return f"[[{escaped_note_title}]]"
+
+
 def input_enex_path() -> None:
     """Read .enex files in directory.
     ---
@@ -35,7 +57,7 @@ def convert_links(enex_path: pathlib.Path) -> pathlib.Path:
     print(f"Converting {enex_path.name}...")
     enex_contents = enex_path.read_text()
     enex_contents_with_converted_links = re.sub(
-        r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", enex_contents
+        r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', _format_note_link, enex_contents
     )
     enex_contents_with_converted_links = re.sub(
         r"(<h1.*?>)(.*?)(</h1>?)", r"\2", enex_contents_with_converted_links

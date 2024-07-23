@@ -186,4 +186,52 @@ I updated the pattern matching behavior to accommodate additional attributes in 
 
 After implementing regular expressions, I realized that I actually didn't need Beautiful Soup at all. I could just read the file as a string, modify the string, and then write the string to a new file. Simple! I made a few touch-ups, such as using <a href="https://docs.python.org/3/library/pathlib.html" rel="external" target="_blank"><code>pathlib</code></a> instead of `os` for file path operations, but at this point, the code was ready to run.
 
+#### Updating regular expressions for wiki links
+
+Bear has made lots of progress since I first imported my notes. <a href="https://web.archive.org/web/20240531045315/https://bear.app/faq/how-to-link-notes-together/" rel="external" target="_blank">Note links</a> have been updated with some new "wiki link" features:
+
+- Forward slashes reference headings within notes (`[[note title/heading]]`)
+- Pipes configure aliases (different link titles) (`[[note title|alias]]`)
+
+If any notes have forward slashes or pipes in the titles, links to those notes need to escape (ignore) forward slashes and pipes to avoid conflicting with how they are used in Bear wiki links. Bear uses backslashes to escape characters in note links, so backslashes themselves also need to be escaped.
+
+Previously, the script was simply formatting links by placing the note title (`\2`, the second capture group in the regular expression) inside double brackets, like `[[note title]]`.
+
+```py
+enex_contents_with_converted_links = re.sub(
+    r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', r"[[\2]]", enex_contents
+)
+```
+
+The second argument to `re.sub` can also accept a "<a href="https://docs.python.org/3/glossary.html#term-callable" rel="external" target="_blank">callable</a>" (function or other object with a `__call__` method). One way to pass a callable to `re.sub` is to use a <a href="https://docs.python.org/3/tutorial/controlflow.html#lambda-expressions" rel="external" target="_blank">lambda expression</a>:
+
+```py
+enex_contents_with_converted_links = re.sub(
+    r'(<a.*?href="evernote.*?>)(.*?)(</a>?)',
+    lambda match: f"[[{match.group(2).replace("\\", r"\\").replace(r"/", r"\/").replace(r"|", r"\|")}]]",
+    enex_contents,
+)
+```
+
+The lambda expression might be considered difficult to read. Let's move the callable to a separate function definition, with a leading underscore to indicate that the function is <a href="https://docs.python.org/3/tutorial/classes.html#private-variables" rel="external" target="_blank">private</a> (only for use within this script). As explained in the <a href="https://docs.python.org/3/library/re.html" rel="external" target="_blank"><code>re</code> docs</a>, "If _repl_ is a function, it is called for every non-overlapping occurrence of _pattern_. The function takes a single `Match` argument, and returns the replacement string." The function should therefore identify the second capture group within the `Match` argument, escape special characters, and return the formatted wiki link, like this:
+
+```py
+def _format_note_link(match: re.Match) -> str:
+    note_title = match.group(2)
+    escaped_note_title = note_title.replace("\\", r"\\")
+    escaped_note_title = escaped_note_title.replace("/", r"\/")
+    escaped_note_title = escaped_note_title.replace("|", r"\|")
+    return f"[[{escaped_note_title}]]"
+```
+
+We'll then reference the function as the second argument to `re.sub`.
+
+```py
+enex_contents_with_converted_links = re.sub(
+    r'(<a.*?href="evernote.*?>)(.*?)(</a>?)', _format_note_link, enex_contents
+)
+```
+
+Note links will now be properly escaped.
+
 [^1]: From _Stand on Zanzibar_ by John Brunner, Continuity 3
